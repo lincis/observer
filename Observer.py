@@ -15,6 +15,7 @@ class Observer(Service):
         fh.setFormatter(formatter)
         self.logger.addHandler(fh)
         self.logger.setLevel(logging.DEBUG)
+        self.logger.debug("Init completed")
 
     def run(self):
         while not self.got_sigterm():
