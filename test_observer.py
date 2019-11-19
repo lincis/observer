@@ -29,19 +29,25 @@ class MockNumericApi(requests_staticmock.BaseMockClass):
     def _types_pytest_data(self, request, body):
         return ''
 
-    def _data(self, request, body):
+    def _heeeehe(self, request, body):
         return ''
 
-class TestObserver:
+@pytest.fixture(scope = "session")
+def observer():
     session = requests.Session()
-
-    def setup_class(self):
+    with requests_staticmock.mock_session_with_class(session, MockNumericApi, config.BASE_URL):
         try:
             os.remove(config.LOG_FILE)
         except:
             pass
-        with requests_staticmock.mock_session_with_class(self.session, MockNumericApi, config.BASE_URL):
-            self.observer = ParticularObserver(session = self.session, name = "Pytest observer")
+        yield ParticularObserver(session = session, name = "Pytest observer")
+
+
+class TestObserver:
+
+    def setup_class(self):
+        pass
+
 
     def teardown_class(self):
         try:
@@ -49,8 +55,8 @@ class TestObserver:
         except:
             pass
 
-    def test_token(self):
-            assert self.observer.bearer
+    def test_token(self, observer):
+        assert observer.bearer
 
-    def test_observe(self):
-        self.observer.observe_and_upload()
+    def test_observe(self, observer):
+        observer.observe_and_upload()

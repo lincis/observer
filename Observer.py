@@ -77,28 +77,36 @@ class Observer(Service):
 
     def observe_and_upload(self):
         def send_data():
-            response = self.session.request('post', '%s/data' % (self.config.BASE_URL),
-                data = json.dumps({
+            data_to_send = {'Data': []}
+            for type_id in self.data_types.keys():
+                value = observation.get(type_id, None)
+                if not value:
+                    continue
+                data_to_send['Data'].append({
                     'data_source_id': self.config.DATA_SOURCE_ID,
                     'data_type_id': type_id,
                     'value': value,
                     'entity_created': obs_time
-                }), headers = self.header()
+                })
+            self.logger.debug('Send data to %s: %s' % ('%s/heeeehe' % (self.config.BASE_URL), data_to_send))
+            response = self.session.request('post', '%s/heeeehe' % (self.config.BASE_URL),
+                data = json.dumps(data_to_send), headers = self.header()
             )
             if not response.ok:
                 raise Exception('Creating source failed: %s' % response.text)
         observation = self.observe()
         self.logger.debug('Observerd: %s' % observation)
         obs_time = datetime.now().isoformat()
-        for type_id in self.data_types.keys():
-            value = observation.get('type_id', None)
-            if not value:
-                continue
+        try:
+            send_data()
+        except Exception as e:
+            self.logger.info('Data sending failed: %s, will retry' % str(e))
             try:
-                send_data()
-            except:
                 self.get_bearer()
                 send_data()
+            except Exception as e:
+                self.logger.info('Data sending failed: %s' % str(e))
+                raise
 
     def run(self):
         while not self.got_sigterm():
