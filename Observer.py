@@ -88,8 +88,8 @@ class Observer(Service):
                     'value': value,
                     'entity_created': obs_time
                 })
-            self.logger.debug('Send data to %s: %s' % ('%s/heeeehe' % (self.config.BASE_URL), data_to_send))
-            response = self.session.request('post', '%s/heeeehe' % (self.config.BASE_URL),
+            self.logger.debug('Send data to %s: %s' % ('%s/data' % (self.config.BASE_URL), data_to_send))
+            response = self.session.request('post', '%s/data' % (self.config.BASE_URL),
                 data = json.dumps(data_to_send), headers = self.header()
             )
             if not response.ok:
@@ -105,7 +105,7 @@ class Observer(Service):
                 self.get_bearer()
                 send_data()
             except Exception as e:
-                self.logger.info('Data sending failed: %s' % str(e))
+                self.logger.error('Data sending failed: %s' % str(e))
                 raise
 
     def run(self):
