@@ -9,3 +9,4 @@ class Config(object):
     LOG_FILE = os.environ.get("LOG_FILE", "observer.log")
     DATA_SOURCE_ID = os.environ.get("DATA_SOURCE_ID")
     DATA_SOURCE = os.environ.get("DATA_SOURCE")
+    MAX_QUEUE_ITEMS = os.environ.get("MAX_QUEUE_ITEMS", 100)

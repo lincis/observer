@@ -26,6 +26,7 @@ class Observer(Service):
         self.create_source_and_type()
         if not self.data_types:
             self.data_types = {'default': {'name': 'Default data type', 'units': 'default', 'description': 'Base class built in type'}}
+        self.data_queue = []
         self.logger.debug("Init completed")
 
     def get_bearer(self, renew = False):
@@ -52,61 +53,53 @@ class Observer(Service):
     def header(self):
         return {'Authorization': 'Bearer %s' % self.bearer}
 
-    def create_source_and_type(self):
-        def implementation():
-            url = '%s/sources/%s' % (self.config.BASE_URL, self.config.DATA_SOURCE_ID)
-            self.logger.info('Post to %s' % url)
+    def post(self, url, data):
+        def _impl():
             response = self.session.request('post', url,
-                data = json.dumps({'name': self.config.DATA_SOURCE}), headers = self.header()
+                data = json.dumps(data), headers = self.header()
             )
             if not response.ok:
                 raise Exception('Creating source failed: %s' % response.text)
-            for type_id, type_def in self.data_types.items():
-                url = '%s/types/%s' % (self.config.BASE_URL, type_id)
-                self.logger.info('Post to %s' % url)
-                response = self.session.request('post', url,
-                    data = json.dumps(type_def), headers = self.header()
-                )
-                if not response.ok:
-                    raise Exception('Creating source failed: %s' % response.text)
+            return response
+        self.logger.info('Post to %s: %s' % (url, data))
         try:
-            implementation()
+            response = _impl()
         except:
-            self.get_bearer()
-            implementation()
+            try:
+                self.get_bearer()
+                response = _impl()
+            except Exception as e:
+                self.logger.error('Post failed: %s' % str(e))
+                raise
+        self.logger.info('Post success: %s' % (response.text))
+
+
+    def create_source_and_type(self):
+        url = '%s/sources/%s' % (self.config.BASE_URL, self.config.DATA_SOURCE_ID)
+        self.post(url, {'name': self.config.DATA_SOURCE})
+        for type_id, type_def in self.data_types.items():
+            url = '%s/types/%s' % (self.config.BASE_URL, type_id)
+            self.post(url, type_def)
 
     def observe_and_upload(self):
-        def send_data():
-            data_to_send = {'Data': []}
-            for type_id in self.data_types.keys():
-                value = observation.get(type_id, None)
-                if not value:
-                    continue
-                data_to_send['Data'].append({
-                    'data_source_id': self.config.DATA_SOURCE_ID,
-                    'data_type_id': type_id,
-                    'value': value,
-                    'entity_created': obs_time
-                })
-            self.logger.debug('Send data to %s: %s' % ('%s/data' % (self.config.BASE_URL), data_to_send))
-            response = self.session.request('post', '%s/data' % (self.config.BASE_URL),
-                data = json.dumps(data_to_send), headers = self.header()
-            )
-            if not response.ok:
-                raise Exception('Creating source failed: %s' % response.text)
         observation = self.observe()
         self.logger.debug('Observerd: %s' % observation)
         obs_time = datetime.now().isoformat()
-        try:
-            send_data()
-        except Exception as e:
-            self.logger.info('Data sending failed: %s, will retry' % str(e))
-            try:
-                self.get_bearer()
-                send_data()
-            except Exception as e:
-                self.logger.error('Data sending failed: %s' % str(e))
-                raise
+        for type_id in self.data_types.keys():
+            value = observation.get(type_id, None)
+            if not value:
+                continue
+            self.data_queue.append({
+                'data_source_id': self.config.DATA_SOURCE_ID,
+                'data_type_id': type_id,
+                'value': value,
+                'entity_created': obs_time
+            })
+        while len(self.data_queue) > self.config.MAX_QUEUE_ITEMS:
+            removed = self.data_queue.pop(0)
+            self.logger.warn('Removing item from queue, because length increases %d: %s' % (self.config.MAX_QUEUE_ITEMS, removed))
+        self.post('%s/data' % self.config.BASE_URL, {'Data': self.data_queue})
+        self.data_queue = []
 
     def run(self):
         while not self.got_sigterm():
