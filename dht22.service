@@ -1,0 +1,15 @@
+[Unit]
+Description = DHT22 observation service
+After = syslog.target
+
+[Service]
+Type = simple
+User = node
+Group = node
+WorkingDirectory = /home/pi/observer
+ExecStart = source .env; python3 dht22.py start
+ExecStop = source .env; python3 dht22.py stop
+Restart = always
+
+[Install]
+WantedBy = multi-user.target
