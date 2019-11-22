@@ -30,7 +30,7 @@ if __name__ == '__main__':
         sys.exit('Syntax: %s COMMAND' % sys.argv[0])
 
     cmd = sys.argv[1].lower()
-    service = ObserverDH22(name = 'dh22', pid_dir='/tmp')
+    service = ObserverDH22(name = 'dh22', pid_dir='/var/run')
 
     if cmd == 'start':
         service.start()
