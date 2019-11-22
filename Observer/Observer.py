@@ -10,7 +10,7 @@ import json
 from service import Service
 
 class Observer(Service):
-    def __init__(self, name, session = None):
+    def __init__(self, name, session = None, *args, **kwargs):
         super(Observer, self).__init__(name = name)
         fh = logging.FileHandler("observer.log")
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -40,7 +40,7 @@ class Observer(Service):
         b_config = config['Bearer']
         if renew or not b_config.get('Value', None):
             response = self.session.request('post', '%s/authorize' % self.config.BASE_URL
-                , data = json.dumps({'username': self.config.API_USER, 'password': self.config.API_PW})
+                , json = {'username': self.config.API_USER, 'password': self.config.API_PW}
             )
             self.logger.debug('Auth response: %s', response.text)
             if not response.ok:
@@ -55,8 +55,8 @@ class Observer(Service):
 
     def post(self, url, data):
         def _impl():
-            response = self.session.request('post', url,
-                data = json.dumps(data), headers = self.header()
+            response = self.session.request('put', url,
+                json = data, headers = self.header()
             )
             if not response.ok:
                 raise Exception('Creating source failed: %s' % response.text)
@@ -104,7 +104,7 @@ class Observer(Service):
     def run(self):
         while not self.got_sigterm():
             try:
-                self.observe()
+                self.observe_and_upload()
                 self.logger.debug("Observed")
             except:
                 self.logger.exception("Failed to observe")
