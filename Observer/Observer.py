@@ -98,8 +98,12 @@ class Observer(Service):
         while len(self.data_queue) > self.config.MAX_QUEUE_ITEMS:
             removed = self.data_queue.pop(0)
             self.logger.warn('Removing item from queue, because length increases %d: %s' % (self.config.MAX_QUEUE_ITEMS, removed))
-        self.post('%s/data' % self.config.BASE_URL, {'Data': self.data_queue})
-        self.data_queue = []
+        try:
+            self.post('%s/data' % self.config.BASE_URL, {'Data': self.data_queue})
+            self.data_queue = []
+        except Exception as e:
+            self.logger.error('Post failed: %s' % str(e))
+            self.logger.info('%d items in queue' % len(self.queue))
 
     def run(self):
         while not self.got_sigterm():
