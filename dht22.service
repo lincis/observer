@@ -4,12 +4,14 @@ After = syslog.target
 
 [Service]
 Type = simple
-User = node
-Group = node
+User = root
 WorkingDirectory = /home/pi/observer
-ExecStart = source .env; python3 dht22.py start
-ExecStop = source .env; python3 dht22.py stop
+EnvironmentFile = /etc/dht22.env
+ExecStart = /usr/bin/env python3 /home/pi/observer/dht22.py start
+ExecStop = /usr/bin/env python3 /home/pi/observer/dht22.py stop
+PIDFile = /var/run/dh22.pid
 Restart = always
+RestartSec = 5
 
 [Install]
 WantedBy = multi-user.target
