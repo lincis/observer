@@ -1,8 +1,8 @@
 import pytest
 import requests
 import requests_staticmock
-from .Observer import Observer
-from .config import Config
+from Observer.Observer import Observer
+from Observer.config import Config
 import json
 import os
 
