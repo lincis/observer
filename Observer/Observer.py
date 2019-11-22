@@ -112,7 +112,7 @@ class Observer(Service):
                 self.logger.debug("Observed")
             except:
                 self.logger.exception("Failed to observe")
-            time.sleep(5)
+            time.sleep(self.config.OBSERVATION_INTERVAL)
 
     def observe(self):
         raise NotImplementedError
