@@ -19,8 +19,8 @@ class ObserverDH22(Observer):
         humidity, temperature = dht.read_retry(dht.DHT22, 18)
         self.logger.info('Temp=%.1f*C  Humidity=%.1f' % (temperature, humidity))
         return {
-            'dht22_temperature': temperature,
-            'dht22_humidity': humidity
+            'dht22_temperature': round(temperature, 1),
+            'dht22_humidity': round(humidity, 1)
         }
 
 if __name__ == '__main__':
