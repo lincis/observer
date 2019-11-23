@@ -103,7 +103,7 @@ class Observer(Service):
             self.data_queue = []
         except Exception as e:
             self.logger.error('Post failed: %s' % str(e))
-            self.logger.info('%d items in queue' % len(self.queue))
+            self.logger.info('%d items in queue' % len(self.data_queue))
 
     def run(self):
         while not self.got_sigterm():
