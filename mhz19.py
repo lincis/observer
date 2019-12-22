@@ -9,7 +9,11 @@ class ObserverMHZ19(Observer):
         super(ObserverMHZ19, self).__init__(session = session, name = name, *args, **kwargs)
 
     def observe(self):
-        co2 = mh_z19.read().get('co2', None)
+        co2 = mh_z19.read()
+        if co2 is None:
+            self.logger.warning('Cannot read CO2 from MH-Z19')
+            return None
+        co2 = co2.get('co2', None)
         self.logger.info('CO2 = %d ppm' % (co2))
         return {
             'mhz19_co2': co2
