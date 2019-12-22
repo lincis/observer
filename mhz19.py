@@ -12,7 +12,7 @@ class ObserverMHZ19(Observer):
         co2 = mh_z19.read()
         if co2 is None:
             self.logger.warning('Cannot read CO2 from MH-Z19')
-            return None
+            return {}
         co2 = co2.get('co2', None)
         self.logger.info('CO2 = %d ppm' % (co2))
         return {
