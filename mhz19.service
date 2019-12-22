@@ -1,6 +1,6 @@
 [Unit]
 Description = MH-Z19 observation service
-After = syslog.target
+After = syslog.target getty.target
 
 [Service]
 Type = simple
@@ -9,7 +9,7 @@ WorkingDirectory = /home/pi/observer
 EnvironmentFile = /etc/mhz19.env
 ExecStart = /usr/bin/env python3 /home/pi/observer/mhz19.py start
 ExecStop = /usr/bin/env python3 /home/pi/observer/mhz19.py stop
-PIDFile = /var/run/mhz19.pid
+PIDFile = /var/run/mhz19b.pid
 Restart = always
 RestartSec = 5
 

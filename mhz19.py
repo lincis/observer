@@ -11,9 +11,6 @@ class ObserverMHZ19(Observer):
 
     def observe(self):
         raw_data = subprocess.run(['python', '-m', 'mh_z19'], stdout=subprocess.PIPE)
-        if raw_data == 'null' or raw_data is None:
-            self.logger.warning('Cannot read CO2 from MH-Z19')
-            return {}
         co2 = json.loads(raw_data.stdout.decode('utf-8')).get('co2', None)
         self.logger.info('CO2 = %d ppm' % (co2))
         return {
