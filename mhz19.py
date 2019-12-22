@@ -27,7 +27,7 @@ if __name__ == '__main__':
         sys.exit('Syntax: %s COMMAND' % sys.argv[0])
 
     cmd = sys.argv[1].lower()
-    service = ObserverMHZ19(name = 'mhz19b', pid_dir='/var/run')
+    service = ObserverMHZ19(name = 'mhz19b', pid_dir = '/var/run')
 
     if cmd == 'start':
         service.start()
