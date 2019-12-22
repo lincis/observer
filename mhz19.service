@@ -1,0 +1,17 @@
+[Unit]
+Description = MH-Z19 observation service
+After = syslog.target
+
+[Service]
+Type = simple
+User = root
+WorkingDirectory = /home/pi/observer
+EnvironmentFile = /etc/mhz19.env
+ExecStart = /usr/bin/env python3 /home/pi/observer/mhz19.py start
+ExecStop = /usr/bin/env python3 /home/pi/observer/mhz19.py stop
+PIDFile = /var/run/mhz19.pid
+Restart = always
+RestartSec = 5
+
+[Install]
+WantedBy = multi-user.target
