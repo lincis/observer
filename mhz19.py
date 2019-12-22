@@ -1,4 +1,5 @@
-import mh_z19
+import subprocess
+import json
 from Observer.Observer import Observer
 
 class ObserverMHZ19(Observer):
@@ -9,11 +10,11 @@ class ObserverMHZ19(Observer):
         super(ObserverMHZ19, self).__init__(session = session, name = name, *args, **kwargs)
 
     def observe(self):
-        co2 = mh_z19.read()
-        if co2 is None:
+        raw_data = subprocess.run(['python', '-m', 'mh_z19'], stdout=subprocess.PIPE)
+        if raw_data == 'null' or raw_data is None:
             self.logger.warning('Cannot read CO2 from MH-Z19')
             return {}
-        co2 = co2.get('co2', None)
+        co2 = json.loads(raw_data.stdout).get('co2', None)
         self.logger.info('CO2 = %d ppm' % (co2))
         return {
             'mhz19_co2': co2
