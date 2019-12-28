@@ -13,7 +13,7 @@ class Observer(Service):
     def __init__(self, name, session = None, *args, **kwargs):
         super(Observer, self).__init__(name = name)
         self.config = Config()
-        fh = logging.FileHandler(self.config.LOG_FILE)
+        fh = logging.WatchedFileHandler(self.config.LOG_FILE)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
         self.logger.addHandler(fh)
