@@ -11,7 +11,7 @@ ExecStart = /usr/bin/env python3 /home/pi/observer/mhz19.py start
 ExecStop = /usr/bin/env python3 /home/pi/observer/mhz19.py stop
 PIDFile = /var/run/mhz19b.pid
 Restart = always
-RestartSec = 5
+RestartSec = 120
 
 [Install]
 WantedBy = multi-user.target

@@ -112,7 +112,7 @@ class Observer(Service):
                 self.logger.debug("Observed")
             except:
                 self.logger.exception("Failed to observe")
-                pass
+                raise
             time.sleep(self.config.OBSERVATION_INTERVAL)
 
     def observe(self):
