@@ -23,6 +23,7 @@ class ObserverMHZ19(Observer):
         try:
             co2 = mh_z19.read().get('co2', None)
         except:
+            self.logger.warning("Cannot read from MH-Z19B, resetting power.")
             GPIO.output(RELAY_PIN, GPIO.LOW)
             time.sleep(10)
             GPIO.output(RELAY_PIN, GPIO.HIGH)
