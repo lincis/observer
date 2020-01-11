@@ -86,7 +86,6 @@ class Observer(Service):
 
     def observe_and_upload(self):
         observation = self.observe()
-        self.redis.publish(self.name, json.dumps(observation))
         self.logger.debug('Observerd: %s' % observation)
         obs_time = datetime.now().isoformat()
         for type_id in self.data_types.keys():
@@ -108,6 +107,7 @@ class Observer(Service):
         except Exception as e:
             self.logger.error('Post failed: %s' % str(e))
             self.logger.info('%d items in queue' % len(self.data_queue))
+        self.redis.publish(self.name, json.dumps(observation))
 
     def run(self):
         while not self.got_sigterm():
