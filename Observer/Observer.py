@@ -6,6 +6,7 @@ import configparser
 import requests
 from datetime import datetime
 import json
+import redis
 
 from service import Service
 
@@ -18,6 +19,8 @@ class Observer(Service):
         fh.setFormatter(formatter)
         self.logger.addHandler(fh)
         self.logger.setLevel(getattr(logging, self.config.LOG_LEVEL))
+        self.name = name
+        self.redis = redis.Redis(host = 'localhost', port = 6379, db = 0)
         if not session:
             self.session = requests.Session()
         else:
@@ -83,6 +86,7 @@ class Observer(Service):
 
     def observe_and_upload(self):
         observation = self.observe()
+        self.redis.publish(self.name, observation)
         self.logger.debug('Observerd: %s' % observation)
         obs_time = datetime.now().isoformat()
         for type_id in self.data_types.keys():
