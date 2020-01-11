@@ -20,7 +20,7 @@ class Observer(Service):
         self.logger.addHandler(fh)
         self.logger.setLevel(getattr(logging, self.config.LOG_LEVEL))
         self.name = name
-        self.redis = redis.Redis(host = 'localhost', port = 6379, db = 0)
+        self.redis = redis.Redis(host = 'localhost', port = 6379, db = 0, socket_keepalive = True)
         if not session:
             self.session = requests.Session()
         else:
