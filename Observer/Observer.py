@@ -86,7 +86,7 @@ class Observer(Service):
 
     def observe_and_upload(self):
         observation = self.observe()
-        self.redis.publish(self.name, observation)
+        self.redis.publish(self.name, json.dumps(observation))
         self.logger.debug('Observerd: %s' % observation)
         obs_time = datetime.now().isoformat()
         for type_id in self.data_types.keys():
