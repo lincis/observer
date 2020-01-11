@@ -20,7 +20,7 @@ class Observer(Service):
         self.logger.addHandler(fh)
         self.logger.setLevel(getattr(logging, self.config.LOG_LEVEL))
         self.name = name
-        self.redis = redis.Redis(host = 'localhost', port = 6379, db = 0, socket_keepalive = True)
+        self.redis = redis.Redis(host = 'localhost', port = 6379, db = 0, health_check_interval = 30)
         if not session:
             self.session = requests.Session()
         else:
@@ -86,11 +86,7 @@ class Observer(Service):
 
     def observe_and_upload(self):
         observation = self.observe()
-        try:
-            self.redis.publish(self.name, json.dumps(observation))
-        except:
-            self.redis = redis.Redis(host = 'localhost', port = 6379, db = 0, socket_keepalive = True)
-            self.redis.publish(self.name, json.dumps(observation))
+        self.redis.publish(self.name, json.dumps(observation))
         self.logger.debug('Observerd: %s' % observation)
         obs_time = datetime.now().isoformat()
         for type_id in self.data_types.keys():
