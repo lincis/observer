@@ -86,7 +86,11 @@ class Observer(Service):
 
     def observe_and_upload(self):
         observation = self.observe()
-        self.redis.publish(self.name, json.dumps(observation))
+        try:
+            self.redis.publish(self.name, json.dumps(observation))
+        except:
+            self.redis = redis.Redis(host = 'localhost', port = 6379, db = 0, socket_keepalive = True)
+            self.redis.publish(self.name, json.dumps(observation))
         self.logger.debug('Observerd: %s' % observation)
         obs_time = datetime.now().isoformat()
         for type_id in self.data_types.keys():
