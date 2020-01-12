@@ -7,9 +7,7 @@ Type = simple
 User = root
 WorkingDirectory = /home/pi/observer
 EnvironmentFile = /etc/mhz19.env
-ExecStart = /usr/bin/env python3 /home/pi/observer/mhz19.py start
-ExecStop = /usr/bin/env python3 /home/pi/observer/mhz19.py stop
-PIDFile = /var/run/mhz19b.pid
+ExecStart = /usr/bin/env python3 /home/pi/observer/mhz19.py
 Restart = always
 RestartSec = 120
 

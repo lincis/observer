@@ -24,27 +24,5 @@ class ObserverDH22(Observer):
         }
 
 if __name__ == '__main__':
-    import sys
-
-    if len(sys.argv) != 2:
-        sys.exit('Syntax: %s COMMAND' % sys.argv[0])
-
-    cmd = sys.argv[1].lower()
-    service = ObserverDH22(name = 'dh22', pid_dir='/var/run')
-
-    if cmd == 'start':
-        service.start()
-    elif cmd == 'stop':
-        service.stop()
-    elif cmd == 'status':
-        if service.is_running():
-            print ("Service is running.")
-        else:
-            print ("Service is not running.")
-    elif cmd == 'restart':
-        while service.is_running():
-            service.stop()
-            time.sleep(1)
-        service.start()
-    else:
-        sys.exit('Unknown command "%s".' % cmd)
+    service = ObserverDH22(name = 'dh22')
+    service.run()
