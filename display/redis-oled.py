@@ -14,6 +14,7 @@ import adafruit_ssd1306
 import redis
 import json
 import time
+import os
 
 # Define the Reset Pin
 oled_reset = digitalio.DigitalInOut(board.D4)
@@ -33,7 +34,7 @@ oled.fill(0)
 oled.show()
 
 # Subscribe to redis messages
-r = redis.Redis(host = 'localhost', port = 6379, db = 0, socket_keepalive = True, health_check_interval = 0)
+r = redis.Redis(host = os.getenv('REDIS_HOST', localhost), port = os.getenv('REDIS_PORT', 6379), db = 0, socket_keepalive = True, health_check_interval = 0)
 p = r.pubsub(ignore_subscribe_messages = True)
 p.subscribe('mhz19b', 'dh22')
 

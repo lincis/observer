@@ -1,0 +1,14 @@
+[Unit]
+Description = Observer to I2C display service
+After = syslog.target
+
+[Service]
+Type = simple
+User = pi
+WorkingDirectory = /home/pi/observer/display
+ExecStart = /usr/bin/env python3 /home/pi/observer/display/redis-oled.py
+Restart = always
+RestartSec = 5
+
+[Install]
+WantedBy = multi-user.target
