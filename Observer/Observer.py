@@ -110,14 +110,13 @@ class Observer:
         self.redis.publish(self.name, json.dumps(observation))
 
     def run(self):
-        while not self.got_sigterm():
-            try:
-                self.observe_and_upload()
-                self.logger.debug("Observed")
-            except:
-                self.logger.exception("Failed to observe")
-                raise
-            time.sleep(self.config.OBSERVATION_INTERVAL)
+        try:
+            self.observe_and_upload()
+            self.logger.debug("Observed")
+        except:
+            self.logger.exception("Failed to observe")
+            raise
+        time.sleep(self.config.OBSERVATION_INTERVAL)
 
     def observe(self):
         raise NotImplementedError
