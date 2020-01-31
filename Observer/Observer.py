@@ -31,6 +31,7 @@ class Observer:
             self.data_types = {'default': {'name': 'Default data type', 'units': 'default', 'description': 'Base class built in type'}}
         self.data_queue = []
         self.logger.debug("Init completed")
+        self.last_observation = None
 
     def get_bearer(self, renew = False):
         config = configparser.ConfigParser()
@@ -88,25 +89,31 @@ class Observer:
         observation = self.observe()
         self.logger.debug('Observerd: %s' % observation)
         obs_time = datetime.now().isoformat()
-        for type_id in self.data_types.keys():
-            value = observation.get(type_id, None)
-            if not value:
-                continue
-            self.data_queue.append({
-                'data_source_id': self.config.DATA_SOURCE_ID,
-                'data_type_id': type_id,
-                'value': value,
-                'entity_created': obs_time
-            })
-        while len(self.data_queue) > self.config.MAX_QUEUE_ITEMS:
-            removed = self.data_queue.pop(0)
-            self.logger.warn('Removing item from queue, because length increases %d: %s' % (self.config.MAX_QUEUE_ITEMS, removed))
-        try:
-            self.post('%s/data' % self.config.BASE_URL, {'Data': self.data_queue})
-            self.data_queue = []
-        except Exception as e:
-            self.logger.error('Post failed: %s' % str(e))
-            self.logger.info('%d items in queue' % len(self.data_queue))
+        send_data = False
+        if not self.last_observation:
+            send_data = True
+        elif (datetime.now() - self.last_observation).seconds >= self.config.OBSERVATION_INTERVAL:
+            send_data = True
+        if send_data:
+            for type_id in self.data_types.keys():
+                value = observation.get(type_id, None)
+                if not value:
+                    continue
+                self.data_queue.append({
+                    'data_source_id': self.config.DATA_SOURCE_ID,
+                    'data_type_id': type_id,
+                    'value': value,
+                    'entity_created': obs_time
+                })
+            while len(self.data_queue) > self.config.MAX_QUEUE_ITEMS:
+                removed = self.data_queue.pop(0)
+                self.logger.warn('Removing item from queue, because length increases %d: %s' % (self.config.MAX_QUEUE_ITEMS, removed))
+            try:
+                self.post('%s/data' % self.config.BASE_URL, {'Data': self.data_queue})
+                self.data_queue = []
+            except Exception as e:
+                self.logger.error('Post failed: %s' % str(e))
+                self.logger.info('%d items in queue' % len(self.data_queue))
         self.redis.publish(self.name, json.dumps(observation))
 
     def run(self):
@@ -117,7 +124,7 @@ class Observer:
             except:
                 self.logger.exception("Failed to observe")
                 raise
-            time.sleep(self.config.OBSERVATION_INTERVAL)
+            time.sleep(1)
 
     def observe(self):
         raise NotImplementedError
