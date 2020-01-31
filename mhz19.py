@@ -13,7 +13,7 @@ class ObserverMHZ19(Observer):
             'mhz19_co2': {'name': 'CO2', 'description': 'CO2 concentration from MH-Z19B', 'units': 'ppm'}
         }
         super(ObserverMHZ19, self).__init__(session = session, name = name, *args, **kwargs)
-        mh_z19.abc_off()
+#        mh_z19.abc_off()
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(RELAY_PIN, GPIO.OUT)
         GPIO.output(RELAY_PIN, GPIO.HIGH)
