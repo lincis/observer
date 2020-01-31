@@ -94,8 +94,8 @@ class Observer:
             send_data = True
         elif (datetime.now() - self.last_observation).seconds >= self.config.OBSERVATION_INTERVAL:
             send_data = True
-        self.last_observation = datetime.now()
         if send_data:
+            self.last_observation = datetime.now()
             for type_id in self.data_types.keys():
                 value = observation.get(type_id, None)
                 if not value:
