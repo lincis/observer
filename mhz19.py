@@ -16,7 +16,7 @@ class ObserverMHZ19(Observer):
 #        mh_z19.abc_off()
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(RELAY_PIN, GPIO.OUT)
-        GPIO.output(RELAY_PIN, GPIO.HIGH)
+        # GPIO.output(RELAY_PIN, GPIO.HIGH)
 
     def observe(self):
 #        raw_data = subprocess.run(['python', '-m', 'mh_z19'], stdout=subprocess.PIPE)
@@ -24,9 +24,9 @@ class ObserverMHZ19(Observer):
             co2 = mh_z19.read().get('co2', None)
         except:
             self.logger.warning("Cannot read from MH-Z19B, resetting power.")
-            GPIO.output(RELAY_PIN, GPIO.LOW)
-            time.sleep(10)
             GPIO.output(RELAY_PIN, GPIO.HIGH)
+            time.sleep(10)
+            GPIO.output(RELAY_PIN, GPIO.LOW)
             co2 = mh_z19.read().get('co2', None)
         self.logger.info('CO2 = %d ppm' % (co2))
         return {
