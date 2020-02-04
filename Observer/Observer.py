@@ -125,7 +125,7 @@ class Observer:
             except:
                 self.logger.exception("Failed to observe")
                 raise
-            time.sleep(1)
+            time.sleep(self.config.READ_INTERVAL)
 
     def observe(self):
         raise NotImplementedError
