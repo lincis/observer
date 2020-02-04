@@ -48,8 +48,8 @@ while True:
         continue
 
     # Clear display.
-    oled.fill(0)
-    oled.show()
+#    oled.fill(0)
+#    oled.show()
 
     print(message)
 
