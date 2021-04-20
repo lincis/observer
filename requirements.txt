@@ -10,7 +10,7 @@ more-itertools==7.2.0
 packaging==19.2
 pid==2.2.5
 pluggy==0.13.0
-py==1.8.0
+py==1.10.0
 pyparsing==2.4.5
 pytest==5.2.4
 pytest-env==0.6.2
