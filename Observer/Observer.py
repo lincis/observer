@@ -7,6 +7,7 @@ import requests
 from datetime import datetime
 import json
 import redis
+from prometheus_client import CollectorRegistry, push_to_gateway
 
 from service import Service
 
@@ -21,12 +22,16 @@ class Observer:
         self.logger.setLevel(getattr(logging, self.config.LOG_LEVEL))
         self.name = name
         self.redis = redis.Redis(host = 'localhost', port = 6379, db = 0, health_check_interval = 30)
+        if self.config.PUSH_PROMETHEUS:
+            self.prom_registry = CollectorRegistry()
+            self.prom_gauges = {}
         if not session:
             self.session = requests.Session()
         else:
             self.session = session
         self.get_bearer()
-        self.logger.info("DO_POST = %s", self.config.DO_POST)
+        self.logger.debug("DO_POST = %s", self.config.DO_POST)
+        self.logger.debug("PUSH_PROMETHEUS = %s", self.config.PUSH_PROMETHEUS)
         if self.config.DO_POST:
             self.create_source_and_type()
         if not self.data_types:
@@ -118,6 +123,17 @@ class Observer:
                 self.logger.error('Post failed: %s' % str(e))
                 self.logger.info('%d items in queue' % len(self.data_queue))
         self.redis.publish(self.name, json.dumps(observation))
+        if self.config.PUSH_PROMETHEUS:
+            try:
+                for type_id in self.data_types.keys():
+                    value = observation.get(type_id, None)
+                    g = self.prom_gauges.get(type_id, None)
+                    if g is not None:
+                        g.set(value)
+                push_to_gateway('localhost:9091', job = 'Observer_%s' % self.name, registry = self.prom_registry)
+                self.logger.info('Push to Prometheus succesfull: %s', str(self.prom_gauges))
+            except Exception as e:
+                self.logger.warn('Push to prometheus failed: %s', str(e))
 
     def run(self):
         while True:

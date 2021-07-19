@@ -12,6 +12,7 @@ import argparse
 import sys
 import json
 import os.path
+from prometheus_client import Gauge
 
 # setting
 version = "0.3.9"
@@ -47,6 +48,10 @@ class ObserverMHZ19(Observer):
             'mhz19_co2': {'name': 'CO2', 'description': 'CO2 concentration from MH-Z19B', 'units': 'ppm'}
         }
         super(ObserverMHZ19, self).__init__(session = session, name = name, *args, **kwargs)
+        try:
+            self.prom_gauges['mhz19_co2'] = Gauge('mhz19_co2', 'CO2 concentration from MH-Z19B, ppm', registry = self.prom_registry)
+        except Exception as e:
+            self.logger.warn('Failed to create gauges: %s', str(e))
         subprocess.call(stop_getty, stdout = subprocess.PIPE, shell = True)
         self.con_serial = connect_serial()
 

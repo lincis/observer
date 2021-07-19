@@ -2,6 +2,7 @@
 #import board
 import Adafruit_DHT as dht
 from Observer.Observer import Observer
+from prometheus_client import Gauge
 
 class ObserverDH22(Observer):
 #    dhtDevice = adafruit_dht.DHT22(board.D18)
@@ -12,6 +13,11 @@ class ObserverDH22(Observer):
             'dht22_humidity': {'name': 'Humidity', 'description': 'Humidity from DHT22 sensor', 'units': '%'}
         }
         super(ObserverDH22, self).__init__(session = session, name = name, *args, **kwargs)
+        try:
+            self.prom_gauges['dht22_temperature'] = Gauge('dht22_temperature', 'Temperature from DHT22 sensor, ℃', registry = self.prom_registry)
+            self.prom_gauges['dht22_humidity'] = Gauge('dht22_humidity', 'Humidity from DHT22 sensor, %', registry = self.prom_registry)
+        except Exception as e:
+            self.logger.warn('Failed to create gauges: %s', str(e))
 
     def observe(self):
 #        temperature = self.dhtDevice.temperature

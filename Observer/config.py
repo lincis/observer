@@ -13,3 +13,4 @@ class Config(object):
     READ_INTERVAL = os.environ.get('READ_INTERVAL', 3)
     OBSERVATION_INTERVAL = os.environ.get('OBSERVATION_INTERVAL', 60)
     DO_POST = os.environ.get('DO_POST', True) in (True, 'true', '1', 't')
+    PUSH_PROMETHEUS = os.environ.get('PUSH_PROMETHEUS', True) in (True, 'true', '1', 't')
