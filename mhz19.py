@@ -64,6 +64,8 @@ class ObserverMHZ19(Observer):
                 if len(s) >= 4 and s[0] == 0xff and s[1] == 0x86:
                     co2 = s[2]*256 + s[3]
                 break
+        if co2 is None:
+            raise Exception('Could not read CO2 conventration')
         return {
             'mhz19_co2': co2
         }

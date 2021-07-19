@@ -26,7 +26,9 @@ class Observer:
         else:
             self.session = session
         self.get_bearer()
-        self.create_source_and_type()
+        self.logger.info("DO_POST = %s", self.config.DO_POST)
+        if self.config.DO_POST:
+            self.create_source_and_type()
         if not self.data_types:
             self.data_types = {'default': {'name': 'Default data type', 'units': 'default', 'description': 'Base class built in type'}}
         self.data_queue = []
@@ -91,9 +93,9 @@ class Observer:
         obs_time = datetime.now().isoformat()
         send_data = False
         if not self.last_observation:
-            send_data = True
+            send_data = True and self.config.DO_POST
         elif (datetime.now() - self.last_observation).seconds >= self.config.OBSERVATION_INTERVAL:
-            send_data = True
+            send_data = True and self.config.DO_POST
         if send_data:
             self.last_observation = datetime.now()
             for type_id in self.data_types.keys():
